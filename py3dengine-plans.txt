@@ -1,0 +1,69 @@
+py3dengine: The great break up
+
+--> How do builtin resources work?
+--> Importing will need a modular infrastructure since each module will be responsible for providing importers
+--> Math will be handled by a python extension called py3dengine.math
+--> Physics will be handled by a python extension called py3dengine.physics
+--> Logging will be handled by a python library called py3dengine.logger
+--> Rendering will be handled by a python extension called py3dengine.render
+--> Message handling and general data structuring will be handled by a python library called py3dengine.core
+--> A python extension called py3dengine.util will be a dumping ground for random shit
+--> Resource management will need a modular infrastructure because each module will supply relevant resources types
+--> py3dengine.wfo will add an importer
+
+(DONE)
+py3dengine.config (Python)
+--> Load config file
+--> Serve config values to other modules
+
+(DONE)
+py3dengine.logging (Python)
+--> Provide an interface for logging
+--> Provide an interface for writing logs to files
+
+py3dengine.util (C Library?)
+--> Dumping ground for random shit
+--> Mostly convenience functions for python extensions
+--> Might need to be a c library rather than a python extension
+
+(DONE ENOUGH, missing Vec2, Vec4 and misc)
+py3dengine.math (C Library and Python extension wrapper)
+--> Vectors, Quaternions, Matricies, math related helper functions / constants
+
+py3dengine.core (Python?)
+--> Scene management
+--> GameObjects and the message passing infrastructure they enable
+--> Base class for components and default message handlers?
+--> Base class and infastructure for resources?
+--> Add python script resource type and importer
+
+py3dengine.physics (Python extension)
+--> Provide an interface to ODE
+--> Sync game objects to ODE data structures
+--> Tell engine to generate physics timer ticks
+--> Handle physics timer ticks
+--> Generate physics related events
+
+(WIP, lexing, parsing wfo is done, still prcoessing and materials) 
+py3dengine.wfo (Python?)
+--> Add wfo importer that creates model resources
+
+py3dengine.render (Python extension)
+--> Add model, sprite, font, material, shader, texture resource type and importers
+--> Tell engine to generate render timer ticks
+--> Handle render timer ticks
+
+Message passing infastructure:
+Q: What is a message?
+A: A signal to the game or some part of it that something has happened. May contain data describing what happened.
+
+Q: Where do messages come from?
+A: 
+    1) The engine itself, in order to tell the game that something external (the OS) did something.
+    2) The engine itself, to indicate that a regular amount of time has passed.
+    3) The game programmer, through the messaging interface. Player died, goal was met, some game logic.
+
+Q: How long do messages live and what happens to them?
+A: 
+    1) Messages are created by the engine. They are then distrubuted to (all loaded / only the active?) scenes. Scenes then pass the message to the root game object. The root game object first passes the message to all of its components. The components check to see if they have registered interest in the event (have a handler for it). If the message is set to progate, the root game object will then pass it to its children. Messages are immutable?
+    2) Messages can be created by components not just the engine. This is to enable game logic style messages that game programmers can create. Those messages can then enter several "mail chutes". They can be given directly to a GameObject via a reference. This approach could be used to perfrom a "partial propogation". The message could also be given the scene for either engine wide or scene wide distrubtion.
