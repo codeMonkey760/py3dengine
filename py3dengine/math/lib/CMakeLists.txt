@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.26)
 project(py3dmath C)
 
 set(CMAKE_C_STANDARD 11)
